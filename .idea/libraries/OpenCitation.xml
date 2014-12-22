@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="OpenCitation">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/out/artifacts/OpenCitation_jar/OpenCitation.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
