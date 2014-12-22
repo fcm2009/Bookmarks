@@ -1,6 +1,7 @@
+import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -8,59 +9,30 @@ import java.util.Scanner;
  */
 public class Parser {
 
-    private Scanner in;
-    private File file;
-    private BibtexList bibtexList = new BibtexList();
+    private File db;
 
-    public Parser(String path) throws FileNotFoundException {
-        this.file = new File(path);
-        in = new Scanner(file);
+    public Parser(File db) {
+        this.db = db;
     }
 
-    public BibtexList parseType() throws IOException {
-        in.nextLine();                                          //skip first line
-        in.nextLine();                                          //skip second line
-
-
-        String input;
-
-        do {
-            in.nextLine();                                          //skip empty line
-
-            input = in.nextLine();
-            if(input.split(":")[0].equalsIgnoreCase("@comment{jabref-meta"))
-                break;
-            String type = (input.split("\\{")[0]).split("@")[1];
-            String id = (input.split("\\{")[1]).split("\\,")[0];
-            bibtexList.add(parseString(new Bibtex(id, type)));
-        } while(true);
-        return bibtexList;
-    }
-
-    public Bibtex parseString(Bibtex bibtex) throws IOException {
-        String input = read();
-        String bibEnd = in.nextLine();
-        while(!bibEnd.equalsIgnoreCase("}")) {
-            String field = input.split("=")[0].trim();
-            String value = input.split("=")[1].trim();
-            if(!field.equalsIgnoreCase("month"))
-                value = value.split("\\{")[1].trim();
-            else
-                value = value.split("\\,")[0].trim();
-            bibtex.addEntry(new Entry(field, value));
-            input = read();
-            bibEnd = in.nextLine();
+    public ArrayList<File> read() {
+        Scanner in;
+        ArrayList<File> bookmarks = new ArrayList<File>();
+        try{
+            in = new Scanner(db);
+            while(in.hasNext()) {
+                bookmarks.add(new File(in.nextLine()));
+            }
+        } catch (FileNotFoundException e) {
+            JOptionPane.showMessageDialog(null, "Internal Error. Try again");
         }
-        in.nextLine();
-        return bibtex;
+
+        return bookmarks;
     }
 
-    private String read() {
-        String input;
-        in.useDelimiter("(\\}\\,\\r\\n|\\}\\r\\n\\}|\\,\\r\\n[^\\t])");
-        input = in.next();
-        in.reset();
-        return input;
+    public static ArrayList<File> read(File db) {
+        Parser parser = new Parser(db);
+        return parser.read();
     }
 
 }
